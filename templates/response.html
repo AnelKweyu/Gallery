@@ -1,0 +1,8 @@
+<p><b>{{ msg }}</b></p>
+{% if filenames %}
+    {% for filename in filenames %}
+
+  <img src="/static/uploads/{{ filename }}" alt="{{ filename }}">
+
+    {% endfor %}
+{% endif %}

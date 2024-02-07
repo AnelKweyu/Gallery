@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gallery</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
+<style>
+    :root {
+        --primary-color: #0964b0;
+      }
+      .custom-uploader {
+        background-color: #efefef;
+        padding: 32px;
+        border-radius: 20px;
+      }
+
+      input[type=file] {
+        padding: 4px;
+        margin: -4px;
+        position: relative;
+        outline: none;
+
+      }
+      input[type=file]::file-selector-button {
+        border-radius: 4px;
+        padding: 0 16px;
+        height: 40px;
+        cursor: pointer;
+        background-color: white;
+        border: 1px solid rgba(0, 0, 0, 0.16);
+        box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.05);
+        margin-right: 16px;
+        /*
+          This is a hack to change the button label.
+          I'm hiding the default label and then
+          manually applying the width based on
+          updated icon and label.
+        */
+        width: 132px;
+        color: transparent;
+        /*
+          Firefox doesn't support the pseudo ::before
+          or ::after elements on this input field so
+          we need to use the @supports rule to enable
+          default styles fallback for Firefox.
+        */
+      }
+      @supports (-moz-appearance: none) {
+        input[type=file]::file-selector-button {
+          color: var(--primary-color);
+        }
+      }
+      input[type=file]::file-selector-button:hover {
+        background-color: #f3f4f6;
+      }
+      input[type=file]::file-selector-button:active {
+        background-color: #e5e7eb;
+      }
+      input[type=file]::before {
+        position: absolute;
+        pointer-events: none;
+        top: 14px;
+        left: 16px;
+        height: 20px;
+        width: 20px;
+        content: "";
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230964B0'%3E%3Cpath d='M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5-5 5z'/%3E%3C/svg%3E");
+      }
+      input[type=file]::after {
+        position: absolute;
+        pointer-events: none;
+        top: 16px;
+        left: 40px;
+        color: var(--primary-color);
+        content: "Upload File";
+      }
+      input[type=file]:focus-within::file-selector-button, input[type=file]:focus::file-selector-button {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
+      div.scroll-container {
+        overflow: auto;
+        white-space: nowrap;
+        padding: 10px;
+      }
+
+      div.scroll-container img {
+        height: 400px;
+        width: 600px;
+        padding: 10px;
+      }
+
+</style>
+</head>
+    <body>
+        <div class="container">
+            <br />
+            <h3 align="center">Captured Moments</h3>
+            <br />
+            <div>
+                <div>
+                    <form id="uploadImage" method="post" action="/" enctype="multipart/form-data">
+
+                        <div class="custom-uploader">
+                            <span>
+                                <input type="file" name="uploadFile[]" multiple="true" id="uploadFile" accept=".jpg, .png" />
+                                <br>
+                                <input type="submit" id="uploadSubmit" value="Upload" class="btn btn-info" />
+                            </span>
+                          </div>
+                          <br>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div id="targetLayer" class="scroll-container"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<script>
+$(document).ready(function(){
+    $('#uploadImage').submit(function(event){
+        if($('#uploadFile').val()){
+            event.preventDefault();
+            $('#loader-icon').show();
+            $('#targetLayer').hide();
+            $(this).ajaxSubmit({
+                target: '#targetLayer',
+                beforeSubmit:function(){
+                    $('.progress-bar').width('50%');
+                },
+                uploadProgress: function(event, position, total, percentageComplete)
+                {
+                    $('.progress-bar').animate({
+                        width: percentageComplete + '%'
+                    }, {
+                        duration: 1000
+                    });
+                },
+                success:function(data){
+                    $('#loader-icon').hide();
+                    $('#targetLayer').show();
+                    $('#targetLayer').append(data.htmlresponse);
+                },
+                resetForm: true
+            });
+        }
+        return false;
+    });
+});
+</script>
+</body>
+</html>
+
